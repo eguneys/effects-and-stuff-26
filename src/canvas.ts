@@ -9,6 +9,7 @@ type Canvas = {
   set_transform(x: number, y: number, angle: number, w: number, h: number): void
   image(x: number, y: number, w: number, h: number, sx: number, sy: number): void
   load_sheet(src: string): Promise<void>
+  text(text: string, x: number, y: number, size: number, color: Color, align?: CanvasTextAlign): number
 }
 
 type Color = string
@@ -69,6 +70,22 @@ function Canvas(width: number, height: number): Canvas {
         ctx.drawImage(sheet, sx, sy, w, h, x, y, w, h)
     }
 
+
+    function text(text: string, x: number, y: number, size: number, color: Color, align: CanvasTextAlign = 'center') {
+        ctx.fillStyle = color
+        ctx.font = `${size}px 'SairaSlick'`
+        ctx.textBaseline = 'top'
+        ctx.textAlign = align
+
+        ctx.shadowColor = 'black'
+        ctx.shadowOffsetX = 1
+        ctx.shadowOffsetY = 4
+
+        ctx.fillText(text, x, y)
+
+        return ctx.measureText(text).width
+    }
+
     return {
       canvas,
       clear,
@@ -79,7 +96,8 @@ function Canvas(width: number, height: number): Canvas {
       set_transform,
       load_sheet,
       width,
-      height
+      height,
+      text,
     }
 }
 

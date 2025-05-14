@@ -4,6 +4,7 @@ import { Loop } from './loop_input'
 import './style.css'
 import { _init, _render, _update } from './ur.ts'
 import a from './audio'
+import Content from './content'
 
 function app(el: HTMLElement) {
 
@@ -11,6 +12,7 @@ function app(el: HTMLElement) {
 
   Promise.all([
     a.load(),
+    Content.load()
   ]).then(() => {
     g.load_sheet(new Image())
     _init()

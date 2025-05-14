@@ -4,6 +4,7 @@ import { pixel_perfect_position_update, pos_box, pos_xy, position, Position } fr
 import { appr, XY, XYWH } from './util'
 import { Color } from './webgl/color'
 import { g } from './webgl/gl_init'
+import { c } from './canvas'
 import a from './audio'
 import { rnd_int } from './random'
 
@@ -135,6 +136,7 @@ export function _update(delta: number) {
         delta *= 0.555
     }
 
+    update_timer(delta)
     cursor[0] = p.cursor[0]
     cursor[1] = p.cursor[1]
 
@@ -146,6 +148,10 @@ export function _update(delta: number) {
     b_lines.left.forEach(_ => update_lines(_, delta))
     b_lines.bottom.forEach(_ => update_lines(_, delta))
     b_lines.right.forEach(_ => update_lines(_, delta))
+}
+
+function add_score(n: number) {
+    score += n
 }
 
 function update_ball(delta: number) {
@@ -160,6 +166,7 @@ function update_ball(delta: number) {
         ball.pos.h *= 1.2
         ball.dtheta = Math.sign(ball.pos.dy) * 33
         a.play('thud' + rnd_int(2, 4))
+        add_score(1)
     }
 
     if (ball.pos.hit_y) {
@@ -172,6 +179,7 @@ function update_ball(delta: number) {
         ball.dtheta = Math.sign(ball.pos.dx) * 27
 
         a.play('thud' + rnd_int(3, 5))
+        add_score(2)
     }
 
     ball.pos.w = appr(ball.pos.w, 12, 20 * delta / 1000)
@@ -227,6 +235,7 @@ function has_collided_blines_and_update_lines(x: number, y: number, w: number, h
         return true
     }
 
+    return has_collided_bounds(x, y, w, h)
     return false
 }
 
@@ -283,13 +292,6 @@ function has_collided_bounds(x: number, y: number, w: number, h: number) {
     return false
 }
 
-function has_collided_blines(x: number, y: number, w: number, h: number) {
-    return _has_collided_lines(b_lines.top, x, y, w, h) ||
-    _has_collided_lines(b_lines.bottom, x, y, w, h) ||
-    _has_collided_lines(b_lines.left, x, y, w, h) ||
-    _has_collided_lines(b_lines.right, x, y, w, h)
-}
-
 function _has_collided_lines(lines: BoundLine[], x: number, y: number, w: number, h: number) {
 
     for (let i = 0; i < lines.length; i++) {
@@ -332,6 +334,9 @@ function high_shadow2(xywh: XYWH): XYWH {
 
 
 export function _render() {
+
+    render_score()
+
     g.clear()
 
     g.begin_shapes()
@@ -372,6 +377,7 @@ export function _render() {
     g.end_shapes()
 }
 
+
 function corner_box(l: BoundLine): XYWH {
     let [x, y] = pos_xy(l.rest)
 
@@ -391,4 +397,31 @@ function draw_lines(lines: Position[]) {
         g.shape_line(...pos_xy(line), ...pos_xy(nline), line.w * 2, Color.red)
         g.shape_line(...high_shadow2([...pos_xy(line), ...pos_xy(nline)]), line.w * 5, Theme.HighShadow)
     }
+}
+
+let score = 0
+let score_unit = '$$'
+
+let time_in_ms = 0
+
+function update_timer(delta: number) {
+    time_in_ms += delta
+}
+
+function render_score() {
+ 
+    c.clear()
+    c.text("Score", 1750, 30, 54, 'yellow', 'center')
+    let w3 = c.text(score_unit, 1590, 96, 54, 'gold', 'left')
+    c.text(`${score}`.padStart(7, "0"), 1590 + w3 + 6, 96, 54, 'gold', 'left')
+
+    let x = 1676
+    let y = 170
+    let seconds = Math.floor(time_in_ms / 1000)
+    let minutes = Math.floor(seconds / 60)
+    seconds = seconds % 60
+    c.text("Time", 1750, y, 54, 'yellow', 'center')
+    let w = c.text(`${minutes}`.padStart(2, "0"), x, y + 60, 54, 'gold', 'left')
+    let w2 = c.text(`:`, x + w, y + 60, 54, 'gold', 'left')
+    c.text(`${seconds}`.padStart(2, "0"), x + w + w2, y + 60, 54, 'gold', 'left')
 }
