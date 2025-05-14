@@ -25,7 +25,7 @@ export class Color {
   }
 
   get rgba() {
-    return [this.r, this.g, this.b, this.a]
+    return [this.r/255, this.g/255, this.b/255, this.a/255]
   }
 
 

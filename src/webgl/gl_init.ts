@@ -8,7 +8,7 @@ import { createShaderProgram } from './shader';
 import { SpriteBatch } from './batch';
 import { loadTexture } from './texture';
 import { Color } from './color';
-import { Line, Vec2 } from '../math/vec2';
+import { Line } from '../math/vec2';
 
 export type GL = {
     canvas: HTMLCanvasElement,
@@ -27,7 +27,7 @@ export type GL = {
     end_stencil(): void
     begin_shapes(): void
     end_shapes(): void
-    shape_rect(x: number, y: number, w: number, h: number, color: Color): void
+    shape_rect(x: number, y: number, w: number, h: number, color: Color, theta?: number): void
     shape_line(x: number, y: number, x2: number, y2: number, thickness: number, color: Color): void
 }
 
@@ -44,10 +44,10 @@ export function GL(width: number, height: number): GL {
     const gl = canvas.getContext('webgl2', { antialias: false, depth: false, stencil: true })!;
 
     const shape_shader = createShaderProgram(gl, shapeVShader, shapeFShader);
-    const shape_batch = new SpriteBatch(gl, shape_shader)
+    const shape_batch = new SpriteBatch(gl, shape_shader, width, height)
 
     const shader = createShaderProgram(gl, vertexShader, fragmentShader);
-    const batch = new SpriteBatch(gl, shader);
+    const batch = new SpriteBatch(gl, shader, width, height);
 
     //gl.clearColor(130/255, 112/255, 148/255, 1)
     gl.clearColor(30/255, 30/255, 48/255, 1)
@@ -164,16 +164,18 @@ export function GL(width: number, height: number): GL {
         end_shapes() {
             shape_batch.flush()
         },
-        shape_rect(x: number, y: number, w: number, h: number, color: Color) {
+        shape_rect(x: number, y: number, w: number, h: number, color: Color, theta = 0) {
             x = Math.floor(x)
             y = Math.floor(y)
 
+            /*
             x /= width
             y /= height
             w /= width
             h /= height
+            */
 
-            shape_batch.draw(x, y, w, h, 0, 0, 0, 0, color.rgba)
+            shape_batch.draw(x, y, w, h, 0, 0, 0, 0, color.rgba, theta)
         },
         shape_line(x: number, y: number, x2: number, y2: number, thickness: number, color: Color) {
             x = Math.floor(x)
@@ -189,7 +191,7 @@ export function GL(width: number, height: number): GL {
                 return
             }
 
-            let rect = l.extrude(thickness).div(Vec2.make(width, height))
+            let rect = l.extrude(thickness)
 
             shape_batch.draw_rect(rect, 0, 0, 0, 0, color.rgba)
 

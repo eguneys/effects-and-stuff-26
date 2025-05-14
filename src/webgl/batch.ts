@@ -11,7 +11,12 @@ export class SpriteBatch {
   private shader: WebGLProgram;
   private texture: WebGLTexture | null = null;
 
-  constructor(gl: WebGL2RenderingContext, shader: WebGLProgram) {
+  private width: number
+  private height: number
+
+  constructor(gl: WebGL2RenderingContext, shader: WebGLProgram, width: number, height: number) {
+    this.width = width
+    this.height = height
     this.gl = gl;
     this.shader = shader;
     this.buffer = new Float32Array(this.maxSprites * 6 * this.vertexSize / 4);
@@ -62,8 +67,8 @@ export class SpriteBatch {
     ];
 
     for (const [px, py, pu, pv] of vertices) {
-      this.buffer[this.bufferIndex++] = px;
-      this.buffer[this.bufferIndex++] = py;
+      this.buffer[this.bufferIndex++] = px / this.width;
+      this.buffer[this.bufferIndex++] = py / this.height;
       this.buffer[this.bufferIndex++] = pu;
       this.buffer[this.bufferIndex++] = pv;
       this.buffer[this.bufferIndex++] = color[0];
@@ -93,8 +98,8 @@ export class SpriteBatch {
     ];
 
     for (const [px, py, pu, pv] of vertices) {
-      this.buffer[this.bufferIndex++] = px;
-      this.buffer[this.bufferIndex++] = py;
+      this.buffer[this.bufferIndex++] = px / this.width;
+      this.buffer[this.bufferIndex++] = py / this.height;
       this.buffer[this.bufferIndex++] = pu;
       this.buffer[this.bufferIndex++] = pv;
       this.buffer[this.bufferIndex++] = color[0];
