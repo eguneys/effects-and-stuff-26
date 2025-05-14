@@ -7,6 +7,8 @@ import { g } from './webgl/gl_init'
 
 class Theme {
     static Shadow = Color.hex(0x0a071e)
+    static HighShadow = Color.hex(0xf9ed69) // #f9ed6900
+    static HighShadowOnWhite = Color.hex(0xa217e8) //#a217e800
 }
 
 let cursor: XY
@@ -314,6 +316,14 @@ function fx_box(fx: Fx): XYWH {
 function drop_shadow(xywh: XYWH): XYWH {
     return [xywh[0] + 2, xywh[1] + 2, xywh[2], xywh[3]]
 }
+function high_shadow(xywh: XYWH): XYWH {
+    return [xywh[0], xywh[1], xywh[2] / 2, xywh[3] / 2]
+}
+function high_shadow2(xywh: XYWH): XYWH {
+    return [xywh[0] - 2, xywh[1] - 2, xywh[0], xywh[1]]
+}
+
+
 
 
 export function _render() {
@@ -322,6 +332,7 @@ export function _render() {
     g.begin_shapes()
     g.shape_rect(...drop_shadow(ball_box()), Theme.Shadow, ball.theta)
     g.shape_rect(...ball_box(), Color.white, ball.theta)
+    g.shape_rect(...high_shadow(ball_box()), Theme.HighShadowOnWhite, ball.theta)
 
 
     draw_lines(b_lines.top.map(_ => _.pos))
@@ -332,6 +343,7 @@ export function _render() {
     fxs.forEach(fx => {
         g.shape_rect(...drop_shadow(fx_box(fx)), Theme.Shadow)
         g.shape_rect(...fx_box(fx), Color.white)
+        g.shape_rect(...high_shadow(fx_box(fx)), Theme.HighShadowOnWhite)
     })
 
 
@@ -347,7 +359,10 @@ export function _render() {
     g.shape_rect(...corner_box(b_lines.right[0]), Color.red, angle)
     g.shape_rect(...corner_box(b_lines.right[b_lines.right.length - 1]), Color.red, angle)
 
-
+    g.shape_rect(...high_shadow(corner_box(b_lines.top[0])), Theme.HighShadow, angle)
+    g.shape_rect(...high_shadow(corner_box(b_lines.bottom[0])), Theme.HighShadow, angle)
+    g.shape_rect(...high_shadow(corner_box(b_lines.right[0])), Theme.HighShadow, angle)
+    g.shape_rect(...high_shadow(corner_box(b_lines.right[b_lines.right.length - 1])), Theme.HighShadow, angle)
 
     g.end_shapes()
 }
@@ -367,7 +382,8 @@ function draw_lines(lines: Position[]) {
             break
         }
 
-        g.shape_line(...drop_shadow([...pos_xy(line), ...pos_xy(nline)]), line.w, Theme.Shadow)
-        g.shape_line(...pos_xy(line), ...pos_xy(nline), line.w, Color.red)
+        g.shape_line(...drop_shadow([...pos_xy(line), ...pos_xy(nline)]), line.w * 5, Theme.Shadow)
+        g.shape_line(...pos_xy(line), ...pos_xy(nline), line.w * 2, Color.red)
+        g.shape_line(...high_shadow2([...pos_xy(line), ...pos_xy(nline)]), line.w * 5, Theme.HighShadow)
     }
 }
