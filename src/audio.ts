@@ -21,6 +21,10 @@ function AudioContent() {
 
 
         //buffers['pickup'] = await load_audio(ctx, '/audio/sound/pickup.mp3')
+        buffers['thud1'] = await load_audio(ctx, './audio/thud2.wav')
+        buffers['thud2'] = await load_audio(ctx, './audio/thud2.wav')
+        buffers['thud3'] = await load_audio(ctx, './audio/thud3.wav')
+        buffers['thud4'] = await load_audio(ctx, './audio/thud4.wav')
     }
 
     function play(music: string, loop: boolean = false, volume: number = 1) {

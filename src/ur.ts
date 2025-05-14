@@ -4,6 +4,8 @@ import { pixel_perfect_position_update, pos_box, pos_xy, position, Position } fr
 import { appr, XY, XYWH } from './util'
 import { Color } from './webgl/color'
 import { g } from './webgl/gl_init'
+import a from './audio'
+import { rnd_int } from './random'
 
 class Theme {
     static Shadow = Color.hex(0x0a071e)
@@ -157,6 +159,7 @@ function update_ball(delta: number) {
         ball.pos.w *= 0.7
         ball.pos.h *= 1.2
         ball.dtheta = Math.sign(ball.pos.dy) * 33
+        a.play('thud' + rnd_int(2, 4))
     }
 
     if (ball.pos.hit_y) {
@@ -167,6 +170,8 @@ function update_ball(delta: number) {
         ball.pos.w *= 1.2
 
         ball.dtheta = Math.sign(ball.pos.dx) * 27
+
+        a.play('thud' + rnd_int(3, 5))
     }
 
     ball.pos.w = appr(ball.pos.w, 12, 20 * delta / 1000)
